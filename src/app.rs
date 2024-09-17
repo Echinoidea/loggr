@@ -28,6 +28,7 @@ pub struct App {
     loaded_project: Option<CurrentProject>,
     project_list: Vec<String>,
     highlighted_project: usize,
+    project_name_input: String,
 }
 
 impl App {
@@ -42,6 +43,7 @@ impl App {
                 "LOGGR".to_string(),
             ],
             highlighted_project: 0,
+            project_name_input: "".to_string(),
         }
     }
 
@@ -129,12 +131,14 @@ impl App {
 
             let popup_chunks = Layout::default()
                 .direction(Direction::Vertical)
-                .constraints([Constraint::Percentage(100)])
+                .constraints([Constraint::Length(1), Constraint::Length(1)])
                 .split(popup_area);
 
             let popup_prompt = Paragraph::new(Line::from("Enter new project name: "));
+            let popup_input = Paragraph::new(Line::from(self.project_name_input.clone()));
 
             frame.render_widget(popup_prompt, popup_chunks[0]);
+            frame.render_widget(popup_input, popup_chunks[1]);
         }
 
         // Timesheet stuff
@@ -167,9 +171,26 @@ impl App {
                     _ => {}
                 },
                 CurrentScreen::ProjectAdding => match (key.modifiers, key.code) {
-                    (_, KeyCode::Char('q')) => {
+                    (KeyModifiers::CONTROL, KeyCode::Char('q')) => {
                         self.current_screen = CurrentScreen::ProjectEditing;
+
+                        self.project_name_input = "".to_string();
                     }
+
+                    (_, KeyCode::Char(value)) => {
+                        self.project_name_input.push(value);
+                    }
+
+                    (_, KeyCode::Backspace) => {
+                        self.project_name_input.pop();
+                    }
+
+                    (_, KeyCode::Enter) => {
+                        self.project_list.push(self.project_name_input.clone());
+                        self.current_screen = CurrentScreen::ProjectEditing;
+                        self.project_name_input = "".to_string();
+                    }
+
                     _ => {}
                 },
                 CurrentScreen::ClockingInOut => todo!(),
