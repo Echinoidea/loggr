@@ -1,6 +1,8 @@
-pub use app::App;
+mod app;
+mod timesheet;
+mod ui;
 
-pub mod app;
+use app::App;
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
