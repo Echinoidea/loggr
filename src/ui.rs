@@ -3,7 +3,6 @@ use crate::app::App;
 use ratatui::layout::*;
 use ratatui::style::*;
 use ratatui::text::*;
-use ratatui::widgets;
 use ratatui::widgets::*;
 use ratatui::Frame;
 
@@ -48,11 +47,26 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
         .iter()
         .enumerate()
         .map(|(i, project)| {
-            let content = if i == app.highlighted_project {
+            let content = if i == app.highlighted_project && i == app.selected_project {
                 Span::styled(
                     format!("> {}", project),
                     Style::default()
                         .fg(Color::Yellow)
+                        .bg(Color::White)
+                        .add_modifier(Modifier::BOLD),
+                )
+            } else if i == app.highlighted_project {
+                Span::styled(
+                    format!("> {}", project),
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
+                )
+            } else if i == app.selected_project {
+                Span::styled(
+                    format!("  {}", project),
+                    Style::default()
+                        .bg(Color::White)
                         .add_modifier(Modifier::BOLD),
                 )
             } else {
