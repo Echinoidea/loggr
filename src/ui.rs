@@ -1,5 +1,7 @@
 use crate::app;
 use crate::app::App;
+use crate::app::CurrentScreen;
+use color_eyre::eyre::InstallError;
 use ratatui::layout::*;
 use ratatui::style::*;
 use ratatui::text::*;
@@ -30,13 +32,18 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
             .title_alignment(Alignment::Center),
     );
 
-    let instruction_text = if app.current_screen == app::CurrentScreen::Main {
-        "`h` project mode | `l` list mode"
-    } else if app.current_screen == app::CurrentScreen::ProjectEditing {
-        "`a` append project | `x` delete project"
-    } else {
-        ""
-    };
+    let mut instruction_text: &str = "";
+
+    match app.current_screen {
+        CurrentScreen::Main => instruction_text = "`h` project mode | `CTRL + c quit`",
+        CurrentScreen::ProjectEditing => {
+            instruction_text =
+                "`j/down` move down | `k/up` move up | `ENTER` to load | `a` append project | `l` list mode"
+        }
+        CurrentScreen::ProjectAdding => instruction_text = "type to enter a name | `CTRL q` back",
+        CurrentScreen::ClockingInOut => todo!(),
+        CurrentScreen::Exiting => todo!(),
+    }
 
     let instructions = Paragraph::new(instruction_text).bold().green().centered();
 
