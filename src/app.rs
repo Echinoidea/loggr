@@ -1,7 +1,7 @@
 use crate::ui;
 use color_eyre::Result;
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::{widgets::ListDirection, DefaultTerminal};
+use ratatui::DefaultTerminal;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -24,11 +24,6 @@ pub enum CurrentScreen {
     ProjectAdding,
     ClockingInOut,
     Exiting,
-}
-
-pub enum CurrentProject {
-    Name,
-    Data,
 }
 
 enum ScrollDirection {
