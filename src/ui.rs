@@ -1,7 +1,6 @@
 use crate::app;
 use crate::app::App;
 use crate::app::CurrentScreen;
-use color_eyre::eyre::InstallError;
 use ratatui::layout::*;
 use ratatui::style::*;
 use ratatui::text::*;
@@ -59,7 +58,7 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
                     format!("> {}", project),
                     Style::default()
                         .fg(Color::Yellow)
-                        .bg(Color::White)
+                        .bg(Color::DarkGray)
                         .add_modifier(Modifier::BOLD),
                 )
             } else if i == app.highlighted_project {
@@ -73,7 +72,7 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
                 Span::styled(
                     format!("  {}", project),
                     Style::default()
-                        .bg(Color::White)
+                        .bg(Color::DarkGray)
                         .add_modifier(Modifier::BOLD),
                 )
             } else {

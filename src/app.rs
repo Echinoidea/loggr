@@ -1,21 +1,12 @@
-use crate::ui;
+use crate::timesheet::{Timesheet, TimesheetEntry};
+use crate::{files, ui};
 use color_eyre::Result;
-use crossterm::event::{self, Event, KeyCode, KeyModifiers};
+use crossterm::{
+    event::{self, Event, KeyCode, KeyModifiers},
+    terminal::window_size,
+};
 use ratatui::DefaultTerminal;
 use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Timesheet {
-    name: String,
-    entries: Vec<TimesheetEntry>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct TimesheetEntry {
-    date: String,
-    time_in: String,
-    time_out: String,
-}
 
 #[derive(PartialEq, Eq)]
 pub enum CurrentScreen {
@@ -47,11 +38,7 @@ impl App {
             running: true,
             current_screen: CurrentScreen::Main,
             loaded_project: None,
-            project_list: vec![
-                "MIDAS".to_string(),
-                "SAEBRS".to_string(),
-                "LOGGR".to_string(),
-            ],
+            project_list: vec![],
             highlighted_project: 0,
             selected_project: 0,
             project_name_input: "".to_string(),
@@ -59,12 +46,21 @@ impl App {
     }
 
     pub fn run(&mut self, mut terminal: DefaultTerminal) -> Result<()> {
-        let _ = self.make_loggr_dir();
+        let _ = files::make_loggr_dir();
+
+        self.project_list.push(
+            files::load_timesheet("MIDAS2".to_string())?
+                .name
+                .to_string(),
+        );
+
         self.running = true;
+
         while self.running {
             terminal.draw(|frame| ui::draw_ui(self, frame))?;
             self.handle_crossterm_events()?;
         }
+
         Ok(())
     }
 
@@ -93,6 +89,7 @@ impl App {
                     (_, KeyCode::Enter) => self.select_project(),
                     _ => {}
                 },
+
                 CurrentScreen::ProjectAdding => match (key.modifiers, key.code) {
                     (KeyModifiers::CONTROL, KeyCode::Char('q')) => {
                         self.current_screen = CurrentScreen::ProjectEditing;
@@ -115,6 +112,7 @@ impl App {
 
                     _ => {}
                 },
+
                 CurrentScreen::ClockingInOut => todo!(),
                 CurrentScreen::Exiting => todo!(),
             }
@@ -154,29 +152,5 @@ impl App {
                 }
             }
         }
-    }
-
-    fn make_loggr_dir(&mut self) -> std::io::Result<()> {
-        if self.assert_loggr_dir() {
-            return Ok(());
-        }
-
-        // Change to home env
-        let _f = std::fs::create_dir("/home/gabriel/.loggr")?;
-        Ok(())
-    }
-
-    fn assert_loggr_dir(&self) -> bool {
-        let path = std::path::Path::new("/home/gabriel/.loggr/");
-        return path.exists() && path.is_dir();
-    }
-
-    fn load_timesheet(&mut self) {
-        // Load timesheet json file, get each entry object and put into new
-        // TimesheetEntry, put into timesheet vector
-    }
-
-    fn save_timesheet(&self) {
-        todo!();
     }
 }

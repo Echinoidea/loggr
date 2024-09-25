@@ -1,7 +1,7 @@
 mod app;
+mod files;
 mod timesheet;
 mod ui;
-
 use app::App;
 
 fn main() -> color_eyre::Result<()> {
