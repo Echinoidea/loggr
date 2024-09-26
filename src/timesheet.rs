@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Timesheet {
     pub name: String,
     pub entries: Vec<TimesheetEntry>,
@@ -19,6 +19,7 @@ pub struct TimesheetEntry {
     pub time_out: String,
 }
 
+// todo)) implement entry description
 impl TimesheetEntry {
     pub fn new(date: String, time_in: String, time_out: String) -> TimesheetEntry {
         TimesheetEntry {

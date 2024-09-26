@@ -11,7 +11,7 @@ pub fn make_loggr_dir() -> std::io::Result<()> {
         return Ok(());
     }
 
-    // Change to home env
+    // todo)) Change to home env
     let _f = std::fs::create_dir("/home/gabriel/.loggr")?;
     Ok(())
 }

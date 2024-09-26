@@ -54,6 +54,8 @@ impl App {
                 .to_string(),
         );
 
+        self.loaded_project = Some(files::load_timesheet("MIDAS2".to_string())?);
+
         self.running = true;
 
         while self.running {

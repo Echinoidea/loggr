@@ -1,6 +1,8 @@
 use crate::app;
 use crate::app::App;
 use crate::app::CurrentScreen;
+use crate::timesheet::Timesheet;
+use crate::timesheet::TimesheetEntry;
 use ratatui::layout::*;
 use ratatui::style::*;
 use ratatui::text::*;
@@ -19,7 +21,7 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
 
     let chunks_body = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(20)])
+        .constraints([Constraint::Percentage(20), Constraint::Percentage(80)])
         .split(chunks_layout[1]);
 
     // Title
@@ -113,10 +115,64 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
     }
 
     // Timesheet stuff
+    let timesheet_entry_list: Vec<TimesheetEntry> =
+        app.loaded_project.as_ref().unwrap().clone().entries;
 
-    // Render widgets
+    let mut timesheet_entry_list_string: Vec<String> = vec![];
+
+    for i in 0..timesheet_entry_list.len() {
+        timesheet_entry_list_string.push(format!(
+            "{}, {}, {}",
+            timesheet_entry_list[i].date,
+            timesheet_entry_list[i].time_in,
+            timesheet_entry_list[i].time_out
+        ));
+    }
+
+    let entry_list_items: Vec<ListItem> = timesheet_entry_list_string
+        .clone()
+        .iter()
+        .enumerate()
+        .map(|(i, project)| {
+            let content = if i == app.highlighted_project {
+                Span::styled(
+                    format!("> {}", project),
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
+                )
+            } else if i == app.highlighted_project {
+                Span::styled(
+                    format!("> {}", project),
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
+                )
+            } else {
+                Span::raw(format!("  {}", project))
+            };
+
+            ListItem::new(content).style(if i == app.highlighted_project {
+                Style::default()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD)
+            } else {
+                Style::default()
+            })
+        })
+        .collect();
+
+    let entry_list = List::new(entry_list_items).block(
+        Block::default()
+            .title("Entries")
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(Color::White))
+            .border_type(BorderType::Rounded),
+    );
+
     frame.render_widget(title, chunks_layout[0]);
     frame.render_widget(project_list, chunks_body[0]);
+    frame.render_widget(entry_list, chunks_body[1]);
     frame.render_widget(instructions, chunks_layout[2]);
 }
 
