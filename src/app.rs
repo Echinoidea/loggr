@@ -77,6 +77,12 @@ impl App {
             match self.current_screen {
                 CurrentScreen::Main => match (key.modifiers, key.code) {
                     (_, KeyCode::Char('h')) => self.current_screen = CurrentScreen::ProjectEditing,
+                    (_, KeyCode::Char('k') | KeyCode::Up) => {
+                        self.scroll_entries_list(ScrollDirection::Up)
+                    }
+                    (_, KeyCode::Char('j') | KeyCode::Down) => {
+                        self.scroll_entries_list(ScrollDirection::Down)
+                    }
                     _ => {}
                 },
                 CurrentScreen::ProjectEditing => match (key.modifiers, key.code) {
@@ -90,7 +96,15 @@ impl App {
                         self.current_screen = CurrentScreen::Main
                     }
                     (_, KeyCode::Char('a')) => self.current_screen = CurrentScreen::ProjectAdding,
-                    (_, KeyCode::Enter) => self.select_project(),
+                    (_, KeyCode::Char('c') | KeyCode::Char('C')) => {
+                        if let Some(project) = &mut self.loaded_project {
+                            project.clock_io();
+                        } else {
+                            // Handle the case where `loaded_project` is None
+                            println!("No project is loaded.");
+                        }
+                    }
+                    (_, KeyCode::Enter) => self.select_project()?,
                     _ => {}
                 },
 
@@ -108,11 +122,7 @@ impl App {
                         self.project_name_input.pop();
                     }
 
-                    (_, KeyCode::Enter) => {
-                        self.project_list.push(self.project_name_input.clone());
-                        self.current_screen = CurrentScreen::ProjectEditing;
-                        self.project_name_input = "".to_string();
-                    }
+                    (_, KeyCode::Enter) => self.add_project()?,
 
                     _ => {}
                 },
@@ -134,8 +144,24 @@ impl App {
         self.running = false;
     }
 
-    fn select_project(&mut self) {
+    fn select_project(&mut self) -> Result<()> {
         self.selected_project = self.highlighted_project;
+        self.loaded_project = Some(files::load_timesheet(
+            self.project_list[self.selected_project].clone(),
+        )?);
+
+        Ok(())
+    }
+
+    fn add_project(&mut self) -> Result<()> {
+        self.project_list.push(self.project_name_input.clone());
+        self.current_screen = CurrentScreen::ProjectEditing;
+
+        files::save_timesheet(Timesheet::new(self.project_name_input.clone(), vec![]))?;
+
+        self.project_name_input = "".to_string();
+
+        Ok(())
     }
 
     fn scroll_project_list(&mut self, direction: ScrollDirection) {
@@ -155,6 +181,32 @@ impl App {
                     self.highlighted_project += 1;
                 }
             }
+        }
+    }
+
+    fn scroll_entries_list(&mut self, direction: ScrollDirection) {
+        if let Some(project) = &mut self.loaded_project {
+            let entries = &project.entries;
+            match direction {
+                ScrollDirection::Up => {
+                    if self.highlighted_entry == 0 {
+                        self.highlighted_entry = 0;
+                    } else {
+                        self.highlighted_entry -= 1;
+                    }
+                }
+
+                ScrollDirection::Down => {
+                    if self.highlighted_entry + 1 > entries.len() - 1 {
+                        self.highlighted_entry = entries.len() - 1;
+                    } else {
+                        self.highlighted_entry += 1;
+                    }
+                }
+            }
+        } else {
+            // Handle the case where `loaded_project` is None
+            println!("No project is loaded.");
         }
     }
 }

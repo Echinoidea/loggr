@@ -10,6 +10,14 @@ impl Timesheet {
     pub fn new(name: String, entries: Vec<TimesheetEntry>) -> Timesheet {
         Timesheet { name, entries }
     }
+
+    pub fn clock_io(&mut self) {
+        self.entries.push(TimesheetEntry::new(
+            "Today".to_string(),
+            self.entries.len().to_string(),
+            "C".to_string(),
+        ));
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
