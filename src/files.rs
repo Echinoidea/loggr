@@ -22,7 +22,7 @@ fn assert_loggr_dir() -> bool {
 }
 
 pub fn load_timesheet(timesheet_name: String) -> Result<Timesheet> {
-    let content = fs::read_to_string(format!("/home/gabriel/.loggr/{timesheet_name}.csv"))
+    let content = fs::read_to_string(format!("/home/gabriel/.loggr/{timesheet_name}"))
         .expect("Should have been able to read the file");
     let loaded: Value = serde_json::from_str(&content)?;
 
@@ -42,6 +42,25 @@ pub fn load_timesheet(timesheet_name: String) -> Result<Timesheet> {
     Ok(parsed)
 }
 
+pub fn load_all_timesheet_names() -> Result<Vec<String>> {
+    let paths = fs::read_dir("/home/gabriel/.loggr/").unwrap();
+    let mut filenames: Vec<String> = vec![];
+
+    for path in paths {
+        // Get the PathBuf from the directory entry
+        let path = path.unwrap().path();
+
+        // Extract the filename using the `file_name` method
+        if let Some(filename) = path.file_name() {
+            // Convert the OsStr to a String
+            if let Some(filename_str) = filename.to_str() {
+                filenames.push(filename_str.to_string());
+            }
+        }
+    }
+
+    Ok(filenames)
+}
 pub fn save_timesheet(timesheet: Timesheet) -> std::io::Result<()> {
     let timesheet_name = &timesheet.name;
     let mut file = File::create(format!("/home/gabriel/.loggr/{timesheet_name}.csv"))?;

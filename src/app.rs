@@ -49,14 +49,10 @@ impl App {
 
     pub fn run(&mut self, mut terminal: DefaultTerminal) -> Result<()> {
         let _ = files::make_loggr_dir();
+        self.project_list = files::load_all_timesheet_names()?;
 
-        self.project_list.push(
-            files::load_timesheet("MIDAS2".to_string())?
-                .name
-                .to_string(),
-        );
-
-        self.loaded_project = Some(files::load_timesheet("MIDAS2".to_string())?);
+        self.loaded_project = Some(files::load_timesheet(self.project_list[0].clone())?);
+        //self.loaded_project = Some(files::load_timesheet("MIDAS2".to_string())?);
 
         self.running = true;
 
