@@ -30,6 +30,7 @@ pub struct App {
     pub highlighted_project: usize,
     pub project_name_input: String,
     pub selected_project: usize,
+    pub highlighted_entry: usize,
 }
 
 impl App {
@@ -42,6 +43,7 @@ impl App {
             highlighted_project: 0,
             selected_project: 0,
             project_name_input: "".to_string(),
+            highlighted_entry: 0,
         }
     }
 

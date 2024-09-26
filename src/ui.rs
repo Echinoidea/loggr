@@ -134,14 +134,14 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
         .iter()
         .enumerate()
         .map(|(i, project)| {
-            let content = if i == app.highlighted_project {
+            let content = if i == app.highlighted_entry {
                 Span::styled(
                     format!("> {}", project),
                     Style::default()
                         .fg(Color::Yellow)
                         .add_modifier(Modifier::BOLD),
                 )
-            } else if i == app.highlighted_project {
+            } else if i == app.highlighted_entry {
                 Span::styled(
                     format!("> {}", project),
                     Style::default()
@@ -152,7 +152,7 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
                 Span::raw(format!("  {}", project))
             };
 
-            ListItem::new(content).style(if i == app.highlighted_project {
+            ListItem::new(content).style(if i == app.highlighted_entry {
                 Style::default()
                     .fg(Color::Yellow)
                     .add_modifier(Modifier::BOLD)
@@ -170,6 +170,7 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
             .border_type(BorderType::Rounded),
     );
 
+    // Render widgets
     frame.render_widget(title, chunks_layout[0]);
     frame.render_widget(project_list, chunks_body[0]);
     frame.render_widget(entry_list, chunks_body[1]);
