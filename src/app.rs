@@ -51,7 +51,9 @@ impl App {
         let _ = files::make_loggr_dir();
         self.project_list = files::load_all_timesheet_names()?;
 
-        self.loaded_project = Some(files::load_timesheet(self.project_list[0].clone())?);
+        if self.project_list.len() > 0 {
+            self.loaded_project = Some(files::load_timesheet(self.project_list[0].clone())?);
+        }
         //self.loaded_project = Some(files::load_timesheet("MIDAS2".to_string())?);
 
         self.running = true;
@@ -93,11 +95,23 @@ impl App {
                     }
                     (_, KeyCode::Char('a')) => self.current_screen = CurrentScreen::ProjectAdding,
                     (_, KeyCode::Char('c') | KeyCode::Char('C')) => {
+                        //match &self.loaded_project {
+                        //    None => {
+                        //        println!("No project is loaded!")
+                        //    }
+                        //    Some(project) => {
+                        //        project.clone().clock_io();
+                        //        let loaded_project = self.loaded_project.as_ref().unwrap();
+                        //        files::save_timesheet(loaded_project.clone())?;
+                        //    }
+                        //}
                         if let Some(project) = &mut self.loaded_project {
                             project.clock_io();
+                            let loaded_project = self.loaded_project.as_ref().unwrap();
+                            files::save_timesheet(loaded_project.clone())?;
                         } else {
                             // Handle the case where `loaded_project` is None
-                            println!("No project is loaded.");
+                            return Ok(());
                         }
                     }
                     (_, KeyCode::Enter) => self.select_project()?,

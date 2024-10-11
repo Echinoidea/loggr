@@ -115,8 +115,13 @@ pub fn draw_ui(app: &mut App, frame: &mut Frame) {
     }
 
     // Timesheet stuff
-    let timesheet_entry_list: Vec<TimesheetEntry> =
-        app.loaded_project.as_ref().unwrap().clone().entries;
+    let timesheet_entry_list = match &app.loaded_project {
+        None => vec![],
+        Some(loaded_project) => loaded_project.clone().entries,
+    };
+
+    //let timesheet_entry_list: Vec<TimesheetEntry> =
+    //    app.loaded_project.as_ref().unwrap().clone().entries;
 
     let mut timesheet_entry_list_string: Vec<String> = vec![];
 

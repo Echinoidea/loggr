@@ -2,7 +2,7 @@ use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 
-use serde_json::{Result, Value};
+use serde_json::{json, Result, Value};
 
 use crate::timesheet::{Timesheet, TimesheetEntry};
 
@@ -50,7 +50,7 @@ pub fn load_all_timesheet_names() -> Result<Vec<String>> {
         // Get the PathBuf from the directory entry
         let path = path.unwrap().path();
 
-        // Extract the filename using the `file_name` method
+        // Extract th.e filename using the `file_name` method
         if let Some(filename) = path.file_name() {
             // Convert the OsStr to a String
             if let Some(filename_str) = filename.to_str() {
@@ -62,10 +62,11 @@ pub fn load_all_timesheet_names() -> Result<Vec<String>> {
     Ok(filenames)
 }
 pub fn save_timesheet(timesheet: Timesheet) -> std::io::Result<()> {
-    let timesheet_name = &timesheet.name;
-    let mut file = File::create(format!("/home/gabriel/.loggr/{timesheet_name}.csv"))?;
+    // todo)) Remove slashes to ensure not directory
+    let timesheet_name = &timesheet.name.trim();
+    let mut file = File::create(format!("/home/gabriel/.loggr/{timesheet_name}"))?;
 
-    let serialized = serde_json::to_string(&timesheet).unwrap();
+    let serialized = serde_json::to_string(&timesheet)?;
     file.write_all(serialized.as_bytes())?;
     Ok(())
 }
